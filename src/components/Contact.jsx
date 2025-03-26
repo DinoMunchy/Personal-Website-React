@@ -16,7 +16,8 @@ const Contact = () => {
   const [status, setStatus] = useState({
     loading: false,
     success: false,
-    error: false
+    error: false,
+    errorMessage: ''
   });
 
   const handleChange = (e) => {
@@ -29,10 +30,13 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Form submitted:', formData); // Debug log
-    setStatus({ loading: true, success: false, error: false });
+    setStatus({ loading: true, success: false, error: false, errorMessage: '' });
 
     try {
       console.log('Attempting to send email...'); // Debug log
+      console.log('Using service ID:', 'service_bf84qnw'); // Debug log
+      console.log('Using template ID:', 'template_zwfldkb'); // Debug log
+      
       const result = await emailjs.sendForm(
         'service_bf84qnw',
         'template_zwfldkb',
@@ -41,11 +45,16 @@ const Contact = () => {
       );
       
       console.log('Email sent successfully:', result); // Debug log
-      setStatus({ loading: false, success: true, error: false });
+      setStatus({ loading: false, success: true, error: false, errorMessage: '' });
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
       console.error('Detailed error:', error); // Debug log
-      setStatus({ loading: false, success: false, error: true });
+      setStatus({ 
+        loading: false, 
+        success: false, 
+        error: true,
+        errorMessage: error.text || error.message || 'Unknown error occurred'
+      });
     }
   };
 
@@ -144,7 +153,7 @@ const Contact = () => {
               <div className="error-message">
                 Sorry, there was an error sending your message. Please try again.
                 <br />
-                Error details: {status.error.message}
+                Error details: {status.errorMessage}
               </div>
             )}
           </form>
