@@ -1,12 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import emailjs from '@emailjs/browser';
 import '../styles/Contact.css';
 
+// Initialize EmailJS with your public key
+emailjs.init("XR3AV1H6jx9CrzF4C");
+
 const Contact = () => {
+  const form = useRef();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     subject: '',
     message: ''
+  });
+  const [status, setStatus] = useState({
+    loading: false,
+    success: false,
+    error: false
   });
 
   const handleChange = (e) => {
@@ -16,10 +26,24 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your form submission logic here
-    console.log('Form submitted:', formData);
+    setStatus({ loading: true, success: false, error: false });
+
+    try {
+      await emailjs.sendForm(
+        'service_6af7p2l',
+        'template_zwfldkb',
+        form.current,
+        'XR3AV1H6jx9CrzF4C'
+      );
+      
+      setStatus({ loading: false, success: true, error: false });
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      setStatus({ loading: false, success: false, error: true });
+      console.error('Error sending email:', error);
+    }
   };
 
   return (
@@ -61,7 +85,7 @@ const Contact = () => {
               </a>
             </div>
           </div>
-          <form className="contact-form" onSubmit={handleSubmit}>
+          <form ref={form} className="contact-form" onSubmit={handleSubmit}>
             <div className="form-group">
               <input
                 type="text"
@@ -99,11 +123,25 @@ const Contact = () => {
                 value={formData.message}
                 onChange={handleChange}
                 required
-              ></textarea>
+              />
             </div>
-            <button type="submit" className="submit-btn">
-              Send Message
+            <button 
+              type="submit" 
+              className="submit-btn"
+              disabled={status.loading}
+            >
+              {status.loading ? 'Sending...' : 'Send Message'}
             </button>
+            {status.success && (
+              <div className="success-message">
+                Thank you for your message! I'll get back to you soon.
+              </div>
+            )}
+            {status.error && (
+              <div className="error-message">
+                Sorry, there was an error sending your message. Please try again.
+              </div>
+            )}
           </form>
         </div>
       </div>

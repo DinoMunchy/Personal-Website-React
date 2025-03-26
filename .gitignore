@@ -27,3 +27,10 @@ yarn-error.log*
 *.swp
 *.swo 
 node_modules
+
+# SSL
+*.key
+*.csr
+*.pem
+*.crt
+/ssl
