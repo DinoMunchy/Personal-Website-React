@@ -34,7 +34,7 @@ const Contact = () => {
     try {
       console.log('Attempting to send email...'); // Debug log
       const result = await emailjs.sendForm(
-        'service_6af7p2l',
+        'service_bf84qnw',
         'template_zwfldkb',
         form.current,
         'XR3AV1H6jx9CrzF4C'
