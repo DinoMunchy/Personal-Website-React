@@ -3,7 +3,10 @@ import emailjs from '@emailjs/browser';
 import '../styles/Contact.css';
 
 // Initialize EmailJS with your public key
-emailjs.init("XR3AV1H6jx9CrzF4C");
+emailjs.init({
+  publicKey: "XR3AV1H6jx9CrzF4C",
+  limitRate: true
+});
 
 const Contact = () => {
   const form = useRef();
@@ -19,6 +22,7 @@ const Contact = () => {
     error: false,
     errorMessage: ''
   });
+  const [message, setMessage] = useState('');
 
   const handleChange = (e) => {
     setFormData({
@@ -27,28 +31,52 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const sendEmail = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData); // Debug log
     setStatus({ loading: true, success: false, error: false, errorMessage: '' });
+    setMessage('');
 
     try {
       console.log('Attempting to send email...'); // Debug log
-      console.log('Using service ID:', 'service_bf84qnw'); // Debug log
+      console.log('Using service ID:', 'service_bv6cjyp'); // Debug log
       console.log('Using template ID:', 'template_zwfldkb'); // Debug log
       
-      const result = await emailjs.sendForm(
-        'service_bf84qnw',
+      // Format the data according to EmailJS template variables
+      const templateParams = {
+        to_name: 'Matt',
+        from_name: formData.name,
+        from_email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+        reply_to: formData.email
+      };
+
+      console.log('Template parameters:', templateParams);
+      
+      // Add a small delay to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const result = await emailjs.send(
+        'service_bv6cjyp',
         'template_zwfldkb',
-        form.current,
+        templateParams,
         'XR3AV1H6jx9CrzF4C'
       );
+
+      console.log('EmailJS Response:', result); // Debug log
       
-      console.log('Email sent successfully:', result); // Debug log
-      setStatus({ loading: false, success: true, error: false, errorMessage: '' });
-      setFormData({ name: '', email: '', subject: '', message: '' });
+      if (result.status === 200) {
+        setMessage('Message sent successfully!');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+        setStatus({ loading: false, success: true, error: false, errorMessage: '' });
+      } else {
+        throw new Error(`Failed to send message: ${result.status}`);
+      }
     } catch (error) {
       console.error('Detailed error:', error); // Debug log
+      console.error('Error object:', JSON.stringify(error, null, 2)); // Debug log
+      setMessage('Sorry, there was an error sending your message. Please try again.');
+      console.error('Error details:', error.text || error.message);
       setStatus({ 
         loading: false, 
         success: false, 
@@ -97,7 +125,7 @@ const Contact = () => {
               </a>
             </div>
           </div>
-          <form ref={form} className="contact-form" onSubmit={handleSubmit}>
+          <form ref={form} className="contact-form" onSubmit={sendEmail}>
             <div className="form-group">
               <input
                 type="text"
@@ -146,12 +174,12 @@ const Contact = () => {
             </button>
             {status.success && (
               <div className="success-message">
-                Thank you for your message! I'll get back to you soon.
+                {message}
               </div>
             )}
             {status.error && (
               <div className="error-message">
-                Sorry, there was an error sending your message. Please try again.
+                {message}
                 <br />
                 Error details: {status.errorMessage}
               </div>
