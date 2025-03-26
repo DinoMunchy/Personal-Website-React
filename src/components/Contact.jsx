@@ -28,21 +28,24 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Form submitted:', formData); // Debug log
     setStatus({ loading: true, success: false, error: false });
 
     try {
-      await emailjs.sendForm(
+      console.log('Attempting to send email...'); // Debug log
+      const result = await emailjs.sendForm(
         'service_6af7p2l',
         'template_zwfldkb',
         form.current,
         'XR3AV1H6jx9CrzF4C'
       );
       
+      console.log('Email sent successfully:', result); // Debug log
       setStatus({ loading: false, success: true, error: false });
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
+      console.error('Detailed error:', error); // Debug log
       setStatus({ loading: false, success: false, error: true });
-      console.error('Error sending email:', error);
     }
   };
 
@@ -140,6 +143,8 @@ const Contact = () => {
             {status.error && (
               <div className="error-message">
                 Sorry, there was an error sending your message. Please try again.
+                <br />
+                Error details: {status.error.message}
               </div>
             )}
           </form>
