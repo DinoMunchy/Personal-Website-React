@@ -8,8 +8,8 @@
   transition: all 0.3s ease;
   background: linear-gradient(
     90deg,
-    rgba(26, 26, 46, 0.95),
-    rgba(22, 33, 62, 0.95)
+    rgba(26, 26, 46, 0.98),
+    rgba(22, 33, 62, 0.98)
   );
   backdrop-filter: blur(10px);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
